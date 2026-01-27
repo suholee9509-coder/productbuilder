@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎱 행운의 번호 생성기</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 600px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .subtitle {
+            color: #a0a0a0;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        .numbers-container {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+            min-height: 100px;
+            align-items: center;
+        }
+
+        .number-ball {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+            box-shadow: 
+                0 4px 15px rgba(0, 0, 0, 0.3),
+                inset 0 -5px 10px rgba(0, 0, 0, 0.2),
+                inset 0 5px 10px rgba(255, 255, 255, 0.2);
+            animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        @keyframes popIn {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .number-ball.range-1-10 { background: linear-gradient(145deg, #ffd700, #ffb700); color: #333; }
+        .number-ball.range-11-20 { background: linear-gradient(145deg, #4dabf7, #339af0); }
+        .number-ball.range-21-30 { background: linear-gradient(145deg, #ff6b6b, #ee5a5a); }
+        .number-ball.range-31-40 { background: linear-gradient(145deg, #868e96, #6c757d); }
+        .number-ball.range-41-45 { background: linear-gradient(145deg, #51cf66, #40c057); }
+        .number-ball.bonus { 
+            background: linear-gradient(145deg, #be4bdb, #9c36b5);
+            border: 3px solid #ffd700;
+        }
+
+        .placeholder {
+            color: #555;
+            font-size: 1.2rem;
+        }
+
+        .generate-btn {
+            padding: 18px 50px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #1a1a2e;
+            background: linear-gradient(145deg, #ffd700, #ffb700);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(255, 215, 0, 0.6);
+        }
+
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+
+        .divider {
+            width: 2px;
+            height: 50px;
+            background: rgba(255, 215, 0, 0.5);
+            margin: 0 5px;
+        }
+
+        .bonus-label {
+            font-size: 0.8rem;
+            color: #ffd700;
+            margin-top: 8px;
+        }
+
+        .history {
+            margin-top: 50px;
+            width: 100%;
+        }
+
+        .history h3 {
+            color: #a0a0a0;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .history-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .history-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .history-number.range-1-10 { background: #ffd700; color: #333; }
+        .history-number.range-11-20 { background: #4dabf7; }
+        .history-number.range-21-30 { background: #ff6b6b; }
+        .history-number.range-31-40 { background: #868e96; }
+        .history-number.range-41-45 { background: #51cf66; }
+        .history-number.bonus { background: #be4bdb; }
+
+        .history-divider {
+            color: #ffd700;
+            margin: 0 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎱 행운의 번호</h1>
+        <p class="subtitle">버튼을 눌러 오늘의 행운 번호를 확인하세요!</p>
+
+        <div class="numbers-container" id="numbersContainer">
+            <p class="placeholder">번호가 여기에 표시됩니다</p>
+        </div>
+
+        <button class="generate-btn" onclick="generateNumbers()">
+            🎰 번호 뽑기
+        </button>
+
+        <div class="history" id="historySection" style="display: none;">
+            <h3>📋 이전 번호 기록</h3>
+            <div id="historyList"></div>
+        </div>
+    </div>
+
+    <script>
+        let history = [];
+
+        function getColorClass(num, isBonus = false) {
+            if (isBonus) return 'bonus';
+            if (num <= 10) return 'range-1-10';
+            if (num <= 20) return 'range-11-20';
+            if (num <= 30) return 'range-21-30';
+            if (num <= 40) return 'range-31-40';
+            return 'range-41-45';
+        }
+
+        function generateNumbers() {
+            const container = document.getElementById('numbersContainer');
+            container.innerHTML = '';
+
+            // Generate 6 unique numbers from 1-45
+            const numbers = [];
+            while (numbers.length < 6) {
+                const num = Math.floor(Math.random() * 45) + 1;
+                if (!numbers.includes(num)) {
+                    numbers.push(num);
+                }
+            }
+            numbers.sort((a, b) => a - b);
+
+            // Generate bonus number
+            let bonus;
+            do {
+                bonus = Math.floor(Math.random() * 45) + 1;
+            } while (numbers.includes(bonus));
+
+            // Display main numbers with animation delay
+            numbers.forEach((num, index) => {
+                const ball = document.createElement('div');
+                ball.className = `number-ball ${getColorClass(num)}`;
+                ball.textContent = num;
+                ball.style.animationDelay = `${index * 0.1}s`;
+                container.appendChild(ball);
+            });
+
+            // Add divider
+            const divider = document.createElement('div');
+            divider.className = 'divider';
+            divider.style.animation = 'popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards';
+            divider.style.animationDelay = '0.6s';
+            divider.style.opacity = '0';
+            container.appendChild(divider);
+
+            // Add bonus number
+            const bonusWrapper = document.createElement('div');
+            bonusWrapper.style.textAlign = 'center';
+            
+            const bonusBall = document.createElement('div');
+            bonusBall.className = `number-ball bonus`;
+            bonusBall.textContent = bonus;
+            bonusBall.style.animationDelay = '0.7s';
+            bonusWrapper.appendChild(bonusBall);
+
+            const bonusLabel = document.createElement('div');
+            bonusLabel.className = 'bonus-label';
+            bonusLabel.textContent = '보너스';
+            bonusLabel.style.animation = 'popIn 0.5s ease forwards';
+            bonusLabel.style.animationDelay = '0.8s';
+            bonusLabel.style.opacity = '0';
+            bonusWrapper.appendChild(bonusLabel);
+
+            container.appendChild(bonusWrapper);
+
+            // Add to history
+            addToHistory(numbers, bonus);
+        }
+
+        function addToHistory(numbers, bonus) {
+            history.unshift({ numbers, bonus });
+            if (history.length > 5) history.pop();
+
+            const historySection = document.getElementById('historySection');
+            const historyList = document.getElementById('historyList');
+            
+            historySection.style.display = 'block';
+            historyList.innerHTML = '';
+
+            history.forEach((item, idx) => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+
+                item.numbers.forEach(num => {
+                    const numEl = document.createElement('span');
+                    numEl.className = `history-number ${getColorClass(num)}`;
+                    numEl.textContent = num;
+                    historyItem.appendChild(numEl);
+                });
+
+                const divider = document.createElement('span');
+                divider.className = 'history-divider';
+                divider.textContent = '+';
+                historyItem.appendChild(divider);
+
+                const bonusEl = document.createElement('span');
+                bonusEl.className = `history-number bonus`;
+                bonusEl.textContent = item.bonus;
+                historyItem.appendChild(bonusEl);
+
+                historyList.appendChild(historyItem);
+            });
+        }
+    </script>
+</body>
+</html>
