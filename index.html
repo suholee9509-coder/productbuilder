@@ -11,16 +11,37 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --bg-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            --text-primary: white;
+            --text-secondary: #a0a0a0;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --btn-text: #1a1a2e;
+            --divider-color: rgba(255, 215, 0, 0.5);
+            --placeholder-color: #555;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%);
+            --text-primary: #1a1a2e;
+            --text-secondary: #495057;
+            --card-bg: rgba(0, 0, 0, 0.05);
+            --btn-text: #1a1a2e;
+            --divider-color: rgba(255, 180, 0, 0.8);
+            --placeholder-color: #adb5bd;
+        }
+
         body {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background: var(--bg-primary);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: white;
+            color: var(--text-primary);
             padding: 20px;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         .container {
@@ -35,9 +56,33 @@
         }
 
         .subtitle {
-            color: #a0a0a0;
+            color: var(--text-secondary);
             margin-bottom: 40px;
             font-size: 1.1rem;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
 
         .numbers-container {
@@ -87,7 +132,7 @@
         }
 
         .placeholder {
-            color: #555;
+            color: var(--placeholder-color);
             font-size: 1.2rem;
         }
 
@@ -116,7 +161,7 @@
         .divider {
             width: 2px;
             height: 50px;
-            background: rgba(255, 215, 0, 0.5);
+            background: var(--divider-color);
             margin: 0 5px;
         }
 
@@ -132,13 +177,13 @@
         }
 
         .history h3 {
-            color: #a0a0a0;
+            color: var(--text-secondary);
             margin-bottom: 15px;
             font-size: 1rem;
         }
 
         .history-item {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--card-bg);
             border-radius: 10px;
             padding: 12px 15px;
             margin-bottom: 8px;
@@ -146,6 +191,7 @@
             align-items: center;
             gap: 8px;
             font-size: 0.9rem;
+            transition: background 0.3s ease;
         }
 
         .history-number {
@@ -174,6 +220,9 @@
     </style>
 </head>
 <body>
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle" aria-label="테마 전환">
+        🌙
+    </button>
     <div class="container">
         <h1>🎱 행운의 번호</h1>
         <p class="subtitle">버튼을 눌러 오늘의 행운 번호를 확인하세요!</p>
@@ -194,6 +243,37 @@
 
     <script>
         let history = [];
+
+        // 테마 관리
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                updateThemeIcon(savedTheme);
+            } else if (!prefersDark) {
+                document.documentElement.setAttribute('data-theme', 'light');
+                updateThemeIcon('light');
+            }
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+            document.documentElement.setAttribute('data-theme', newTheme === 'dark' ? '' : newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const toggle = document.getElementById('themeToggle');
+            toggle.textContent = theme === 'light' ? '☀️' : '🌙';
+        }
+
+        // 페이지 로드 시 테마 초기화
+        initTheme();
 
         function getColorClass(num, isBonus = false) {
             if (isBonus) return 'bonus';
