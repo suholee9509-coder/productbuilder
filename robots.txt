@@ -1,11 +1,11 @@
 # robots.txt for LottoGen
-# https://suholee9509-coder.github.io/productbuilder/
+# https://productbuilder-d0c.pages.dev/
 
 User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://suholee9509-coder.github.io/productbuilder/sitemap.xml
+Sitemap: https://productbuilder-d0c.pages.dev/sitemap.xml
 
 # Crawl-delay (optional, for polite crawling)
 Crawl-delay: 1
